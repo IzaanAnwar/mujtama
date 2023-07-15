@@ -1,7 +1,18 @@
+import { authOptions } from "@/lib/auth";
+import { getServerSession } from "next-auth";
 import Image from "next/image";
 import Link from "next/link";
+import { redirect } from "next/navigation";
 
-const LandingPage = () => {
+const LandingPage = async () => {
+    const session = await getServerSession(authOptions);
+    console.log("nud");
+
+    if (session) {
+        console.log("entered");
+
+        redirect("/dashboard");
+    }
     return (
         <div className="min-h-screen  ">
             {/* Hero Section */}
