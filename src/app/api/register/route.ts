@@ -1,5 +1,5 @@
 import { RegisterFormValues } from "@/app/register/page";
-import { PrismaClient } from "@prisma/client";
+
 import { NextRequest } from "next/server";
 import bcrypt from "bcrypt";
 import { prisma } from "@/lib/prisma";
@@ -28,29 +28,33 @@ export async function POST(req: NextRequest) {
                 name: body.name,
                 password: hashedPassword,
                 role: "BEGINNER",
-                
             },
         });
 
-        if(newUser) {
-            BEGINNER_TASKS.map(async task => {
+        if (newUser) {
+            BEGINNER_TASKS.map(async (task) => {
                 const createdTasks = await prisma.task.create({
                     data: {
                         ...task,
-                        userId:newUser.id
-                    }
-                })
-                if ( !createdTasks) {
-                    return new Response(JSON.stringify({ error: "Something went wrong" }), {
-                        status: 500,
-                    });
+                        userId: newUser.id,
+                    },
+                });
+                if (!createdTasks) {
+                    return new Response(
+                        JSON.stringify({ error: "Something went wrong" }),
+                        {
+                            status: 500,
+                        },
+                    );
                 }
-            })
-            
+            });
         }
         console.log(newUser);
         return new Response(
-            JSON.stringify({ message: "Succesfully refistered the user", user:newUser }),
+            JSON.stringify({
+                message: "Succesfully refistered the user",
+                user: newUser,
+            }),
             { status: 201 },
         );
     } catch (error: any) {
