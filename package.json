@@ -33,6 +33,7 @@
     "@types/next-auth": "^3.15.0",
     "daisyui": "^3.1.7",
     "prettier": "^3.0.0",
-    "prisma": "^5.0.0"
+    "prisma": "^5.0.0",
+    "@types/node-fetch": "^2.6.4"
   }
 }
