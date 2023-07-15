@@ -27,11 +27,11 @@
     "tailwindcss": "3.3.3",
     "typescript": "5.1.6"
   },
-  "devDependencies": { 
+  "devDependencies": {
     "@types/bcrypt": "^5.0.0",
     "@types/next-auth": "^3.15.0",
     "daisyui": "^3.1.7",
     "prettier": "^3.0.0",
-    "prisma": "^4.16.2"
+    "prisma": "^5.0.0"
   }
 }
