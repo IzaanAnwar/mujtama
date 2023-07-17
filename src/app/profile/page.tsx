@@ -4,13 +4,7 @@ import Image from "next/image";
 import { useSession } from "next-auth/react";
 import Link from "next/link";
 import Loading from "../../components/Loading";
-
-export interface IUser {
-    name: string;
-    email: string;
-    id: string;
-    role: string;
-}
+import { User } from "my-types";
 
 const Profile = () => {
     const { data: session, status } = useSession();
@@ -29,7 +23,7 @@ const Profile = () => {
     if (!session) {
         return <div>Please sign in to view your profile.</div>;
     }
-    const user = session.user as IUser;
+    const user = session.user as User;
 
     const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const file = event.target.files && event.target.files[0];

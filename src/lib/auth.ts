@@ -47,12 +47,7 @@ export const authOptions: NextAuthOptions = {
                 }
 
                 // If no error and we have user data, return it
-                return {
-                    id: user.id,
-                    email: user.email,
-                    name: user.name,
-                    role: user.role,
-                };
+                return user;
             },
         }),
     ],
@@ -65,6 +60,7 @@ export const authOptions: NextAuthOptions = {
                     ...session.user,
                     id: token.id,
                     role: token.role,
+                    chatRoomId: token.chatRoomId,
                 },
             };
         },
@@ -77,6 +73,7 @@ export const authOptions: NextAuthOptions = {
                     ...token,
                     id: u.id,
                     role: u.role,
+                    chatRoomId: u.chatRoomId,
                 };
             }
 

@@ -18,7 +18,12 @@ model User {
   password String
   role     Role   @default(BEGINNER)
 
-  Tasks Task[]
+  Tasks      Task[]
+  Message    Message[]
+  chatRoom   ChatRoom  @relation(fields: [chatRoomId], references: [id])
+  chatRoomId String
+
+  @@index([chatRoomId])
 }
 
 model Task {
@@ -30,6 +35,28 @@ model Task {
   userId    String
 
   @@index([userId])
+}
+
+model ChatRoom {
+  id           String    @id @default(uuid())
+  name         Role
+  participants User[]
+  messages     Message[]
+
+  @@unique([name])
+}
+
+model Message {
+  id         Int      @id @default(autoincrement())
+  content    String
+  timeStamp  DateTime @default(now())
+  sender     User     @relation(fields: [senderId], references: [id])
+  senderId   String
+  chatRoom   ChatRoom @relation(fields: [chatRoomId], references: [id])
+  chatRoomId String
+
+  @@index([senderId])
+  @@index([chatRoomId])
 }
 
 enum Role {
