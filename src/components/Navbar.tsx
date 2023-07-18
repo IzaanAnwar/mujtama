@@ -70,6 +70,14 @@ export default function Navbar() {
                                 </Link>
                             </li>
                             <li>
+                                <Link
+                                    className="justify-between"
+                                    href="/dashboard/room/BEGINNER/task"
+                                >
+                                    My task
+                                </Link>
+                            </li>
+                            <li>
                                 <Link href="profile/settings">Settings</Link>
                             </li>
                             <li>

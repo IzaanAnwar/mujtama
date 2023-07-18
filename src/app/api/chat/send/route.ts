@@ -1,29 +1,30 @@
 import { prisma } from "@/lib/prisma";
+import { pusherServer } from "@/lib/pusher";
 import { Message } from "my-types";
 import { NextRequest, NextResponse } from "next/server";
 
 export const POST = async (req: NextRequest) => {
-    const messages = (await req.json()) as Message;
-    if (!messages) {
-        return new NextResponse(
-            JSON.stringify({ messages: "Nothing to send" }),
-        );
+    const { chat, roomId }: { chat: Message; roomId: string } =
+        await req.json();
+    if (!chat) {
+        return new NextResponse(JSON.stringify({ message: "Nothing to send" }));
     }
     try {
-        const resDb = await prisma.message.create({
+        pusherServer.trigger(roomId, "group-chat", chat);
+
+        await prisma.message.create({
             data: {
-                content: messages.content,
-                sender: { connect: { id: messages.senderId } },
-                chatRoom: { connect: { id: messages.chatRoomId } },
+                content: chat.content,
+                sender: { connect: { id: chat.senderId } },
+                chatRoom: { connect: { id: chat.chatRoomId } },
             },
         });
-        return new NextResponse(
-            JSON.stringify({ message: "success", data: resDb }),
-        );
+
+        return new NextResponse(JSON.stringify({ message: "success" }));
     } catch (error: any) {
         console.log(error);
         return new NextResponse(
-            JSON.stringify({ message: "error", data: error }),
+            JSON.stringify({ message: "error", error: error }),
         );
     }
 };
