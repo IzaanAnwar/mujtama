@@ -67,22 +67,26 @@ export async function POST(req: NextRequest) {
         });
 
         // Create BEGINNER tasks for the new user
-        BEGINNER_TASKS.map(async (task) => {
-            const createdTasks = await prisma.task.create({
-                data: {
-                    ...task,
-                    userId: newUser.id,
-                },
-            });
-            if (!createdTasks) {
-                return new Response(
-                    JSON.stringify({ error: "Something went wrong" }),
-                    {
-                        status: 500,
+        for (const task of BEGINNER_TASKS) {
+            try {
+                const createdTasks = await prisma.task.create({
+                    data: {
+                        ...task,
+                        userId: newUser.id,
                     },
-                );
+                });
+                if (!createdTasks) {
+                    return new Response(
+                        JSON.stringify({ error: "Something went wrong" }),
+                        {
+                            status: 500,
+                        },
+                    );
+                }
+            } catch (error) {
+                console.log(error);
             }
-        });
+        }
         console.log("new room and user => ", newUser);
 
         // Return a response with success message and user details

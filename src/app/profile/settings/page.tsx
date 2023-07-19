@@ -3,7 +3,7 @@
 import { useSession } from "next-auth/react";
 import Loading from "../../../components/Loading";
 import { useState } from "react";
-import { IUser } from "../page";
+import { User } from "my-types";
 
 const SettingsPage = () => {
     const { data: session, status } = useSession();
@@ -21,7 +21,7 @@ const SettingsPage = () => {
     if (!session) {
         return <div>Please sign in to view your profile.</div>;
     }
-    const user = session.user as IUser;
+    const user = session.user as User;
 
     const handleEmailChange = async (
         event: React.MouseEvent<SVGSVGElement, MouseEvent>,

@@ -18,4 +18,12 @@ declare module "my-types" {
     }
 
     export type Role = BEGINNER | INTERMEDIATE | ADVANCE | PRO | G;
+
+    export interface Tasks {
+        id: number;
+        name: string;
+        amount: number;
+        completed: boolean;
+        userId: string;
+    }
 }
