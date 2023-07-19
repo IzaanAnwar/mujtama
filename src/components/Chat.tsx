@@ -79,7 +79,7 @@ const ChatPage = ({ user }: { user: User }) => {
         return () => {
             pusherClient.unsubscribe(user.chatRoomId);
         };
-    }, [user.chatRoomId]);
+    }, [user.chatRoomId, user.id]);
 
     return (
         <div className="flex flex-col h-screen bg-zinc-900 relative">

@@ -47,10 +47,6 @@ export default function Task() {
 
     return (
         <div className="container mx-auto py-10 px-0 md:px-10 ">
-            <h1 className="text-center md:text-left text-2xl md:text-4xl font-bold mb-6">
-                Welcome to the Private Community
-            </h1>
-
             <div className="py-4 px-0 md:px-4  rounded shadow 00 ">
                 <h2 className="text-center md:text-left text-xl md:text-2xl font-semibold mb-4">
                     Task Panel
