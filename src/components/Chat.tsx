@@ -44,6 +44,9 @@ const ChatPage = ({ user }: { user: User }) => {
                 roomId: user.chatRoomId,
             }),
         });
+        if (!response.ok) {
+            alert("something went wrong");
+        }
         // Scroll to the bottom of the chat container
 
         scrollToTop();
