@@ -5,8 +5,10 @@ import { useSession } from "next-auth/react";
 import Link from "next/link";
 import Loading from "../../components/Loading";
 import { User } from "my-types";
+import { useRouter } from "next/navigation";
 
 const Profile = () => {
+    const router = useRouter();
     const { data: session, status } = useSession();
     const [userImage, setUserImage] = useState<string>("");
     const [userName, setUserName] = useState<string>(
@@ -21,7 +23,8 @@ const Profile = () => {
     }
 
     if (!session) {
-        return <div>Please sign in to view your profile.</div>;
+        router.push("/login");
+        return null;
     }
     const user = session.user as User;
 

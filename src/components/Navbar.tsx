@@ -83,11 +83,11 @@ export default function Navbar() {
                             <li>
                                 <Link
                                     href="/"
-                                    onClick={(
+                                    onClick={async (
                                         e: React.FormEvent<HTMLAnchorElement>,
                                     ) => {
                                         e.preventDefault;
-                                        signOut();
+                                        await signOut();
                                     }}
                                 >
                                     Logout
