@@ -29,7 +29,7 @@ export default function Login() {
         event: React.FormEvent<HTMLFormElement>,
     ): Promise<void> => {
         event.preventDefault();
-        console.log(formValue);
+        console.log("form val=>", formValue);
         if (formValue.email == "" || formValue.password == "") {
             setPostError("Missing Fields");
             return;
@@ -42,16 +42,15 @@ export default function Login() {
         });
 
         if (response?.error) {
-            setPostError(response?.error);
-        }
-        if (response?.ok) {
+            setPostError("Credentials does not match! Please try again.");
+        } else {
             router.push("/dashboard");
         }
-        console.log(response);
+        console.log("login res =>", response);
     };
 
     /**
-     * Handles input change events.
+     * Handles input change events
      * Updates the form value state based on the changed input field.
      * @param event - Input change event.
      */
@@ -99,7 +98,9 @@ export default function Login() {
                     />
                 </div>
                 <div
-                    className={`text-center text-error ${!postError && "py-3"}`}
+                    className={`text-center pt-2 text-xs text-error ${
+                        !postError && "py-3"
+                    }`}
                 >
                     {postError}
                 </div>

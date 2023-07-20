@@ -1,9 +1,10 @@
 "use client";
-import { signOut } from "next-auth/react";
+import { signOut, useSession } from "next-auth/react";
 import Image from "next/image";
 import Link from "next/link";
 
 export default function Navbar() {
+    const { data: session, status } = useSession();
     return (
         <nav>
             <div className="navbar bg-base-100">
@@ -82,15 +83,17 @@ export default function Navbar() {
                             </li>
                             <li>
                                 <Link
-                                    href="/"
+                                    href={session?.user ? "/" : "/login"}
                                     onClick={async (
                                         e: React.FormEvent<HTMLAnchorElement>,
                                     ) => {
                                         e.preventDefault;
-                                        await signOut();
+                                        if (session?.user) {
+                                            await signOut();
+                                        }
                                     }}
                                 >
-                                    Logout
+                                    {session?.user ? "Logout" : "Login"}
                                 </Link>
                             </li>
                         </ul>
