@@ -2,7 +2,7 @@
 
 import { Tasks, User } from "my-types";
 import React, { useEffect, useState } from "react";
-import { useSession } from "next-auth/react";
+import { signOut, useSession } from "next-auth/react";
 import Loading from "@/components/Loading";
 import { useRouter } from "next/navigation";
 
@@ -15,7 +15,7 @@ function CheckForPromotion(allTasks: Tasks[]): boolean {
     return true;
 }
 export default function Task() {
-    const { data: session, status, update } = useSession();
+    const { data: session, status, update: updateSession } = useSession();
     const [tasks, setTasks] = useState<Tasks[]>([]);
     const [completed, setCompleted] = useState(false);
     const router = useRouter();
@@ -51,16 +51,14 @@ export default function Task() {
                     if (!res.ok) {
                         router.refresh();
                     }
-                    update({
-                        user,
-                    });
                 }
+                console.log("sesions ==>", session);
 
                 setTasks(data.data);
             };
             getAllTasks();
         }
-    }, [session, completed, update, router]);
+    }, [session, completed, router, updateSession]);
 
     if (status === "loading") {
         return (

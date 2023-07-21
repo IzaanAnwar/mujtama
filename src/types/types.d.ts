@@ -26,4 +26,8 @@ declare module "my-types" {
         completed: boolean;
         userId: string;
     }
+    export interface ISession {
+        user: User;
+        expires: Date;
+    }
 }

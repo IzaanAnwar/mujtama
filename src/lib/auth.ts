@@ -3,6 +3,7 @@ import { NextAuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import bcrypt from "bcrypt";
 import { prisma } from "./prisma";
+import { User } from "my-types";
 
 /**
  * @author Izaan
@@ -52,23 +53,40 @@ export const authOptions: NextAuthOptions = {
         }),
     ],
     callbacks: {
-        session: ({ session, token }) => {
-            // console.log("session callback", { session, token });
+        session: async ({ session, token }) => {
+            console.log("session callback", { session, token });
+            const dbUser = await prisma.user.findFirst({
+                where: {
+                    id: token.id as string,
+                },
+            });
+            if (!dbUser) {
+                // Return old session if user data could not be retrieved
+                return {
+                    ...session,
+                    user: {
+                        ...session.user,
+                        id: token.id,
+                        role: token.role,
+                        chatRoomId: token.chatRoomId,
+                    } as User,
+                };
+            }
             return {
                 ...session,
                 user: {
                     ...session.user,
                     id: token.id,
-                    role: token.role,
-                    chatRoomId: token.chatRoomId,
-                },
+                    role: dbUser.role,
+                    chatRoomId: dbUser.chatRoomId,
+                } as User,
             };
         },
         jwt: ({ token, user }) => {
             // console.log("jwt calback", { token, user });
 
             if (user) {
-                const u = user as unknown as any;
+                const u = user as User;
                 return {
                     ...token,
                     id: u.id,
