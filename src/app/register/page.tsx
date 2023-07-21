@@ -47,12 +47,15 @@ export default function Register() {
                 },
                 body: JSON.stringify(formValue),
             });
+            console.log("reg response => ", response);
+
             if (response.status === 201) {
                 router.push("/dashboard");
             } else if (response.status === 409) {
                 setPostError("Account Exists");
             } else {
                 const message = await response.json();
+
                 setPostError(message.message);
             }
         } catch (error: any) {
@@ -126,7 +129,9 @@ export default function Register() {
                     />
                 </div>
                 <div
-                    className={`text-center text-error ${!postError && "py-3"}`}
+                    className={`text-center text-xs text-error ${
+                        !postError && "py-3"
+                    }`}
                 >
                     {postError === "Account Exists" ? (
                         <div className="flex justify-center items-center">
