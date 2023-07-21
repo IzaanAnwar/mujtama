@@ -3,7 +3,7 @@ declare module "my-types" {
         id: string | number;
         content: string;
         timeStamp: Date | string;
-        sender?: string;
+        sender?: User;
         senderId: string;
         chatRoom?: string;
         chatRoomId: string;

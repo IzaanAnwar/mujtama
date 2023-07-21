@@ -43,7 +43,7 @@ export default function Navbar() {
                             <span className="badge badge-xs badge-primary indicator-item"></span>
                         </div>
                     </button>
-                    <div className="dropdown dropdown-end">
+                    <div className="dropdown dropdown-end ">
                         <label
                             tabIndex={0}
                             className="btn btn-ghost btn-circle avatar"

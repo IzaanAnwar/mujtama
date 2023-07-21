@@ -11,11 +11,13 @@ export default async function Room() {
         console.log("session => ", session);
         redirect("/");
     }
+
     console.log("session => ", session);
     const user = session.user as User;
-    return (
-        <div className="container mx-auto lg:px-32 md:px-16 px-2 ">
-            <ChatPage user={user} />
-        </div>
-    );
+    if (user.role)
+        return (
+            <div className="container mx-auto lg:px-32 md:px-16 px-2 ">
+                <ChatPage user={user} />
+            </div>
+        );
 }

@@ -3,6 +3,7 @@ import { Message, User } from "my-types";
 import { useEffect, useRef, useState } from "react";
 import Loading from "./Loading";
 import { pusherClient } from "@/lib/pusher";
+import Image from "next/image";
 
 const ChatPage = ({ user }: { user: User }) => {
     const [message, setMessage] = useState("");
@@ -73,8 +74,8 @@ const ChatPage = ({ user }: { user: User }) => {
             );
 
             const resData = await res.json();
-            console.log("==>", resData);
             const allChats: Message[] = resData.data;
+            console.log("==>", allChats);
             setAllMsg(allChats);
         };
 
@@ -85,30 +86,42 @@ const ChatPage = ({ user }: { user: User }) => {
     }, [user.chatRoomId, user.id]);
 
     return (
-        <div className="flex flex-col h-screen bg-zinc-900 relative">
+        <div className="flex flex-col h-[85vh] bg-zinc-900  rounded-lg">
             <div
-                className="flex-grow p-4 overflow-y-auto"
+                className="flex-grow p-4 overflow-y-auto "
                 ref={chatContainerRef}
             >
                 {allMsg ? (
                     allMsg?.map((msg, index) => (
                         <div
                             key={index}
-                            className={`flex ${
-                                msg.senderId !== user.id
-                                    ? "justify-start text-black"
-                                    : "justify-end"
+                            className={`chat ${
+                                msg.senderId === user.id
+                                    ? "chat-end"
+                                    : "chat-start"
                             }`}
                         >
-                            <div
-                                className={`bg-gray-100 p-2 rounded-lg mb-2 ${
-                                    msg.senderId !== user.id
-                                        ? "mr-auto bg-gray-200 text-black"
-                                        : "ml-auto bg-teal-400 text-black"
-                                }`}
-                            >
-                                {msg.content}
+                            <div className="chat-image avatar">
+                                <div className="w-10  rounded-full">
+                                    <Image
+                                        src="/images/photo.jpg"
+                                        alt="profile"
+                                        width={10}
+                                        height={10}
+                                    />
+                                </div>
                             </div>
+                            <div className="chat-header">
+                                {msg.sender?.name
+                                    ? msg.sender?.name
+                                    : "Loading ..."}
+                                <time className="px-2 text-xs opacity-50">
+                                    {new Date(msg.timeStamp)
+                                        .toTimeString()
+                                        .substring(0, 5)}
+                                </time>
+                            </div>
+                            <div className="chat-bubble">{msg.content}</div>
                         </div>
                     ))
                 ) : (
@@ -138,6 +151,59 @@ const ChatPage = ({ user }: { user: User }) => {
                 </form>
             </div>
         </div>
+        // <div className="flex flex-col h-[85vh] bg-zinc-900 relative rounded-lg">
+        //     <div
+        //         className="flex-grow p-4 overflow-y-auto "
+        //         ref={chatContainerRef}
+        //     >
+        //         {allMsg ? (
+        //             allMsg?.map((msg, index) => (
+        //                 <div
+        //                     key={index}
+        //                     className={`flex ${
+        //                         msg.senderId !== user.id
+        //                             ? " justify-start text-black"
+        //                             : " justify-end"
+        //                     }`}
+        //                 >
+        //                     <div
+        //                         className={`bg-gray-100 p-2 rounded-lg mb-2 ${
+        //                             msg.senderId !== user.id
+        //                                 ? "mr-auto bg-gray-200 text-black"
+        //                                 : "ml-auto bg-teal-400 text-black"
+        //                         }`}
+        //                     >
+        //                         {msg.content}
+        //                     </div>
+        //                 </div>
+        //             ))
+        //         ) : (
+        //             <div className="h-screen flex justify-center items-center">
+        //                 <Loading />
+        //             </div>
+        //         )}
+        //     </div>
+        //     <div className="flex-shrink-0">
+        //         <form
+        //             className="flex items-center justify-between p-4"
+        //             onSubmit={handleFormSubmit}
+        //         >
+        //             <input
+        //                 type="text"
+        //                 value={message}
+        //                 onChange={handleInputChange}
+        //                 className="flex-grow px-4 py-2 rounded-full bg-zinc-700 text-gray-100 focus:outline-none"
+        //                 placeholder="Type your message..."
+        //             />
+        //             <button
+        //                 type="submit"
+        //                 className="ml-4 px-4 py-2 rounded-full bg-blue-500 text-white"
+        //             >
+        //                 Send
+        //             </button>
+        //         </form>
+        //     </div>
+        // </div>
     );
 };
 

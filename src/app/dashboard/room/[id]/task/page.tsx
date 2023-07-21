@@ -6,8 +6,16 @@ import { useSession } from "next-auth/react";
 import Loading from "@/components/Loading";
 import { useRouter } from "next/navigation";
 
+function CheckForPromotion(allTasks: Tasks[]): boolean {
+    for (let i = 0; i < allTasks.length; i++) {
+        if (allTasks[i].completed === false) {
+            return false;
+        }
+    }
+    return true;
+}
 export default function Task() {
-    const { data: session, status } = useSession();
+    const { data: session, status, update } = useSession();
     const [tasks, setTasks] = useState<Tasks[]>([]);
     const [completed, setCompleted] = useState(false);
     const router = useRouter();
@@ -27,12 +35,32 @@ export default function Task() {
                 }
                 const data = await res.json();
                 console.log("data taks =>", data.data);
+                const allTaskCompeleted = CheckForPromotion(data.data);
+
+                if (allTaskCompeleted) {
+                    const res = await fetch("/api/promote-user", {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json",
+                        },
+                        body: JSON.stringify({
+                            userId: user.id,
+                            userRole: user.role,
+                        }),
+                    });
+                    if (!res.ok) {
+                        router.refresh();
+                    }
+                    update({
+                        user,
+                    });
+                }
 
                 setTasks(data.data);
             };
             getAllTasks();
         }
-    }, [session, completed]);
+    }, [session, completed, update, router]);
 
     if (status === "loading") {
         return (
@@ -67,67 +95,77 @@ export default function Task() {
                             </tr>
                         </thead>
                         <tbody>
-                            {tasks.map((task, idx) => (
-                                <tr
-                                    key={idx}
-                                    className="text-xs md:text-sm font-semibold border-t duration-100 hover:bg-primary hover:text-gray-300 "
-                                >
-                                    <td className="px-4 py-2">{task.name}</td>
-                                    <td className="px-4 py-2">{task.amount}</td>
-                                    <td className="px-4 py-2">
-                                        {task.completed ? "Yes" : "No"}{" "}
-                                        <button
-                                            className="px-2 rounded-full hover:text-base-100"
-                                            onClick={async (e) => {
-                                                e.preventDefault();
+                            {tasks ? (
+                                tasks.map((task, idx) => (
+                                    <tr
+                                        key={idx}
+                                        className="text-xs md:text-sm font-semibold border-t duration-100 hover:bg-primary hover:text-gray-300 "
+                                    >
+                                        <td className="px-4 py-2">
+                                            {task.name}
+                                        </td>
+                                        <td className="px-4 py-2">
+                                            {task.amount}
+                                        </td>
+                                        <td className="px-4 py-2">
+                                            {task.completed ? "Yes" : "No"}{" "}
+                                            <button
+                                                className="px-2 rounded-full hover:text-base-100"
+                                                onClick={async (e) => {
+                                                    e.preventDefault();
 
-                                                const isTaskCompeleted =
-                                                    !task.completed &&
-                                                    window.confirm(
-                                                        "Did you complete this task?",
-                                                    );
+                                                    const isTaskCompeleted =
+                                                        !task.completed &&
+                                                        window.confirm(
+                                                            "Did you complete this task?",
+                                                        );
 
-                                                if (isTaskCompeleted) {
-                                                    const res = await fetch(
-                                                        "/api/tasks/finished",
-                                                        {
-                                                            method: "POST",
-                                                            headers: {
-                                                                "Content-Type":
-                                                                    "application/json",
-                                                            },
-                                                            body: JSON.stringify(
-                                                                {
-                                                                    taskStatus:
-                                                                        isTaskCompeleted,
-                                                                    taskId: task.id,
+                                                    if (isTaskCompeleted) {
+                                                        const res = await fetch(
+                                                            "/api/tasks/finished",
+                                                            {
+                                                                method: "POST",
+                                                                headers: {
+                                                                    "Content-Type":
+                                                                        "application/json",
                                                                 },
-                                                            ),
-                                                        },
-                                                    );
+                                                                body: JSON.stringify(
+                                                                    {
+                                                                        taskStatus:
+                                                                            isTaskCompeleted,
+                                                                        taskId: task.id,
+                                                                    },
+                                                                ),
+                                                            },
+                                                        );
 
-                                                    console.log(res);
+                                                        console.log(res);
 
-                                                    if (!res.ok) {
-                                                        alert(
-                                                            "something wend wrong... Please try again",
-                                                        );
-                                                    } else {
-                                                        alert(
-                                                            "Congratulations",
-                                                        );
-                                                        setCompleted(
-                                                            !completed,
-                                                        );
+                                                        if (!res.ok) {
+                                                            alert(
+                                                                "something wend wrong... Please try again",
+                                                            );
+                                                        } else {
+                                                            alert(
+                                                                "Congratulations",
+                                                            );
+                                                            setCompleted(
+                                                                !completed,
+                                                            );
+                                                        }
                                                     }
-                                                }
-                                            }}
-                                        >
-                                            ✔
-                                        </button>
-                                    </td>
-                                </tr>
-                            ))}
+                                                }}
+                                            >
+                                                ✔
+                                            </button>
+                                        </td>
+                                    </tr>
+                                ))
+                            ) : (
+                                <div className="w-full flex justify-center items-center">
+                                    <Loading />
+                                </div>
+                            )}
                         </tbody>
                     </table>
                 </div>

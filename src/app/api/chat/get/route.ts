@@ -9,7 +9,9 @@ export const GET = async (req: NextRequest) => {
     try {
         const resDb = await prisma.message.findMany({
             where: { chatRoomId: roomId },
-            take: 5,
+            include: {
+                sender: true,
+            },
         });
         console.log(resDb);
 
