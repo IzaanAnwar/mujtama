@@ -39,19 +39,41 @@ export const POST = async (req: NextRequest) => {
     const { userId, userRole }: { userId: string; userRole: Role } =
         await req.json();
     const newRole = updateUserRole(userRole);
+
     try {
+        const chatRoomExists = await prisma.chatRoom.findFirst({
+            where: {
+                name: newRole,
+            },
+        });
+        let chatRoom: {
+            id: string;
+            name: Role;
+        };
+        if (!chatRoomExists) {
+            chatRoom = await prisma.chatRoom.create({
+                data: {
+                    name: newRole,
+                },
+            });
+        } else {
+            chatRoom = chatRoomExists;
+        }
         const user = await prisma.user.update({
             where: {
                 id: userId,
             },
             data: {
                 role: newRole,
+                chatRoomId: chatRoom.id,
             },
         });
         if (!newRole) {
             return NextResponse.json({ message: "failure" }, { status: 400 });
         }
         const newTasks = getTask(newRole);
+        console.log("new Taks =>", newTasks);
+
         for (const task of newTasks) {
             try {
                 const createdTasks = await prisma.task.create({
@@ -72,7 +94,8 @@ export const POST = async (req: NextRequest) => {
                 console.log(error);
             }
         }
-        return NextResponse.json({ message: "success" });
+
+        return NextResponse.json({ message: "success", newRole });
     } catch (error: any) {
         return NextResponse.json(
             { message: "error", error: error.message },
