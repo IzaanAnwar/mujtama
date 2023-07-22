@@ -7,6 +7,7 @@ import Image from "next/image";
 
 const ChatPage = ({ user }: { user: User }) => {
     const [message, setMessage] = useState("");
+    const [loadingComplete, setLoadingComplete] = useState<boolean>(false);
 
     const [allMsg, setAllMsg] = useState<Message[]>([]);
 
@@ -57,7 +58,22 @@ const ChatPage = ({ user }: { user: User }) => {
         const channel = pusherClient.subscribe(user.chatRoomId);
         channel.bind("group-chat", (chat: Message) => {
             setAllMsg((prev: Message[] | null) =>
-                prev ? [...prev, chat] : [chat],
+                prev
+                    ? [
+                          ...prev,
+                          {
+                              ...chat,
+                              sender: user,
+                              timeStamp: new Date().toISOString(),
+                          },
+                      ]
+                    : [
+                          {
+                              ...chat,
+                              sender: user,
+                              timeStamp: Date.now().toString(),
+                          },
+                      ],
             );
         });
 
@@ -75,15 +91,20 @@ const ChatPage = ({ user }: { user: User }) => {
 
             const resData = await res.json();
             const allChats: Message[] = resData.data;
-            console.log("==>", allChats);
             setAllMsg(allChats);
+            setLoadingComplete(true);
         };
 
         getAllMessages();
         return () => {
             pusherClient.unsubscribe(user.chatRoomId);
         };
-    }, [user.chatRoomId, user.id]);
+    }, [user]);
+    useEffect(() => {
+        if (loadingComplete) {
+            scrollToTop();
+        }
+    }, [loadingComplete]);
 
     return (
         <div className="flex flex-col h-[85vh] bg-zinc-900  rounded-lg">
@@ -151,59 +172,6 @@ const ChatPage = ({ user }: { user: User }) => {
                 </form>
             </div>
         </div>
-        // <div className="flex flex-col h-[85vh] bg-zinc-900 relative rounded-lg">
-        //     <div
-        //         className="flex-grow p-4 overflow-y-auto "
-        //         ref={chatContainerRef}
-        //     >
-        //         {allMsg ? (
-        //             allMsg?.map((msg, index) => (
-        //                 <div
-        //                     key={index}
-        //                     className={`flex ${
-        //                         msg.senderId !== user.id
-        //                             ? " justify-start text-black"
-        //                             : " justify-end"
-        //                     }`}
-        //                 >
-        //                     <div
-        //                         className={`bg-gray-100 p-2 rounded-lg mb-2 ${
-        //                             msg.senderId !== user.id
-        //                                 ? "mr-auto bg-gray-200 text-black"
-        //                                 : "ml-auto bg-teal-400 text-black"
-        //                         }`}
-        //                     >
-        //                         {msg.content}
-        //                     </div>
-        //                 </div>
-        //             ))
-        //         ) : (
-        //             <div className="h-screen flex justify-center items-center">
-        //                 <Loading />
-        //             </div>
-        //         )}
-        //     </div>
-        //     <div className="flex-shrink-0">
-        //         <form
-        //             className="flex items-center justify-between p-4"
-        //             onSubmit={handleFormSubmit}
-        //         >
-        //             <input
-        //                 type="text"
-        //                 value={message}
-        //                 onChange={handleInputChange}
-        //                 className="flex-grow px-4 py-2 rounded-full bg-zinc-700 text-gray-100 focus:outline-none"
-        //                 placeholder="Type your message..."
-        //             />
-        //             <button
-        //                 type="submit"
-        //                 className="ml-4 px-4 py-2 rounded-full bg-blue-500 text-white"
-        //             >
-        //                 Send
-        //             </button>
-        //         </form>
-        //     </div>
-        // </div>
     );
 };
 

@@ -15,7 +15,7 @@ function CheckForPromotion(allTasks: Tasks[]): boolean {
     return true;
 }
 export default function Task() {
-    const { data: session, status, update: updateSession } = useSession();
+    const { data: session, status } = useSession();
     const [tasks, setTasks] = useState<Tasks[]>([]);
     const [completed, setCompleted] = useState(false);
     const router = useRouter();
@@ -50,6 +50,8 @@ export default function Task() {
                     });
                     if (!res.ok) {
                         router.refresh();
+                    } else {
+                        router.push("/dashboard");
                     }
                 }
                 console.log("sesions ==>", session);
@@ -58,7 +60,7 @@ export default function Task() {
             };
             getAllTasks();
         }
-    }, [session, completed, router, updateSession]);
+    }, [session, completed, router]);
 
     if (status === "loading") {
         return (
