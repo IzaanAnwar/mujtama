@@ -11,7 +11,7 @@ export const GET = async (req: NextRequest) => {
         const lastMsg = await prisma.message.findUnique({
             where: { id: lastMsgIdNum },
         });
-        console.log("lst=>", lastMsg);
+        console.log("\n\n\nlst=>", lastMsg, "\n\n\n\n");
 
         if (!lastMsg) {
             return NextResponse.json(

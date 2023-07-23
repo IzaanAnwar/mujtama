@@ -1,30 +1,61 @@
 "use client";
 import { Message, User } from "my-types";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import Loading from "./Loading";
 import { pusherClient } from "@/lib/pusher";
 import Image from "next/image";
-import _ from "lodash";
+import { usePathname, useRouter } from "next/navigation";
 
 const ChatPage = ({ user }: { user: User }) => {
     const [message, setMessage] = useState("");
-    const [loadingComplete, setLoadingComplete] = useState<boolean>(false);
-
     const [allMsg, setAllMsg] = useState<Message[]>([]);
 
+    const [loadingComplete, setLoadingComplete] = useState<boolean>(false);
     const chatContainerRef = useRef<HTMLDivElement | null>(null);
+
+    const pathName = usePathname();
+    const router = useRouter();
 
     const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         setMessage(event.target.value);
     };
-    const scrollToBottom = _.debounce(() => {
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    const fetchMoreChats = async () => {
+        const lastMsg = allMsg[0];
+
+        try {
+            const res = await fetch(
+                `/api/chat/more?${user.chatRoomId}?${lastMsg.id}`,
+                {
+                    method: "GET",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                },
+            );
+
+            const { data: newChats }: { data: Message[] } = await res.json();
+
+            setAllMsg((prevChats) => [
+                ...newChats.slice().reverse(),
+                ...prevChats,
+            ]);
+        } catch (error: any) {
+            console.log(error);
+            alert("Something went wrong please reload the page");
+            router.replace(pathName);
+        }
+    };
+
+    const scrollToBottom = () => {
         if (chatContainerRef.current) {
             chatContainerRef.current.scrollTo({
                 top: chatContainerRef.current.scrollHeight,
                 behavior: "smooth",
             });
         }
-    }, 0);
+    };
 
     const handleFormSubmit = async (
         event: React.MouseEvent<HTMLFormElement>,
@@ -52,7 +83,7 @@ const ChatPage = ({ user }: { user: User }) => {
         if (!response.ok) {
             alert("something went wrong");
         }
-        // Scroll to the bottom of the chat container
+        scrollToBottom();
     };
 
     useEffect(() => {
@@ -64,7 +95,6 @@ const ChatPage = ({ user }: { user: User }) => {
         });
 
         const getAllMessages = async () => {
-            scrollToBottom();
             const res = await fetch(
                 `/api/chat/get?${user.id}?${user.chatRoomId}`,
                 {
@@ -77,7 +107,8 @@ const ChatPage = ({ user }: { user: User }) => {
 
             const resData = await res.json();
             const allChats: Message[] = resData.data;
-            setAllMsg(allChats);
+            setAllMsg(allChats.slice().reverse());
+
             setLoadingComplete(true);
         };
 
@@ -91,7 +122,26 @@ const ChatPage = ({ user }: { user: User }) => {
         if (loadingComplete) {
             scrollToBottom();
         }
-    }, [loadingComplete, scrollToBottom]);
+    }, [loadingComplete]);
+
+    useEffect(() => {
+        const handleScrollToTop = async () => {
+            if (chatContainerRef.current) {
+                const viewIsNearTop = chatContainerRef.current.scrollTop === 0;
+                console.log(viewIsNearTop);
+
+                if (viewIsNearTop) {
+                    await fetchMoreChats();
+                }
+            }
+        };
+
+        const chatContainer = chatContainerRef.current;
+        chatContainer?.addEventListener("scroll", handleScrollToTop);
+        return () => {
+            chatContainer?.removeEventListener("scroll", handleScrollToTop);
+        };
+    }, [fetchMoreChats]);
 
     return (
         <div className="flex flex-col h-[85vh] bg-zinc-900  rounded-lg">

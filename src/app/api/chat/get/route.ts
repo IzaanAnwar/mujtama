@@ -12,6 +12,10 @@ export const GET = async (req: NextRequest) => {
             include: {
                 sender: true,
             },
+            take: 25,
+            orderBy: {
+                timeStamp: "desc",
+            },
         });
         console.log(resDb);
 
