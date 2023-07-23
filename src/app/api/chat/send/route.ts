@@ -10,6 +10,8 @@ export const POST = async (req: NextRequest) => {
         return new NextResponse(JSON.stringify({ message: "Nothing to send" }));
     }
     try {
+        console.log("server hcat =>", chat);
+
         pusherServer.trigger(roomId, "group-chat", chat);
 
         await prisma.message.create({

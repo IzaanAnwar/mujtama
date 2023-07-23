@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import Loading from "./Loading";
 import { pusherClient } from "@/lib/pusher";
 import Image from "next/image";
+import _ from "lodash";
 
 const ChatPage = ({ user }: { user: User }) => {
     const [message, setMessage] = useState("");
@@ -16,14 +17,14 @@ const ChatPage = ({ user }: { user: User }) => {
     const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         setMessage(event.target.value);
     };
-    const scrollToTop = () => {
+    const scrollToBottom = _.debounce(() => {
         if (chatContainerRef.current) {
             chatContainerRef.current.scrollTo({
                 top: chatContainerRef.current.scrollHeight,
                 behavior: "smooth",
             });
         }
-    };
+    }, 0);
 
     const handleFormSubmit = async (
         event: React.MouseEvent<HTMLFormElement>,
@@ -42,6 +43,8 @@ const ChatPage = ({ user }: { user: User }) => {
                     content: message,
                     senderId: user.id,
                     chatRoomId: user.chatRoomId,
+                    sender: user,
+                    timeStamp: new Date().toISOString(),
                 },
                 roomId: user.chatRoomId,
             }),
@@ -50,35 +53,18 @@ const ChatPage = ({ user }: { user: User }) => {
             alert("something went wrong");
         }
         // Scroll to the bottom of the chat container
-
-        scrollToTop();
     };
 
     useEffect(() => {
         const channel = pusherClient.subscribe(user.chatRoomId);
         channel.bind("group-chat", (chat: Message) => {
             setAllMsg((prev: Message[] | null) =>
-                prev
-                    ? [
-                          ...prev,
-                          {
-                              ...chat,
-                              sender: user,
-                              timeStamp: new Date().toISOString(),
-                          },
-                      ]
-                    : [
-                          {
-                              ...chat,
-                              sender: user,
-                              timeStamp: Date.now().toString(),
-                          },
-                      ],
+                prev ? [...prev, chat] : [chat],
             );
         });
 
         const getAllMessages = async () => {
-            scrollToTop();
+            scrollToBottom();
             const res = await fetch(
                 `/api/chat/get?${user.id}?${user.chatRoomId}`,
                 {
@@ -96,15 +82,16 @@ const ChatPage = ({ user }: { user: User }) => {
         };
 
         getAllMessages();
+
         return () => {
             pusherClient.unsubscribe(user.chatRoomId);
         };
-    }, [user]);
+    }, [user.chatRoomId, user.id]);
     useEffect(() => {
         if (loadingComplete) {
-            scrollToTop();
+            scrollToBottom();
         }
-    }, [loadingComplete]);
+    }, [loadingComplete, scrollToBottom]);
 
     return (
         <div className="flex flex-col h-[85vh] bg-zinc-900  rounded-lg">

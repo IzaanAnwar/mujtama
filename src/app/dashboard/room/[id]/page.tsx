@@ -1,6 +1,6 @@
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
-import ChatPage from "@/components/Chat";
+import ChatPage from "@/components/ChatPage";
 import { redirect } from "next/navigation";
 import { User } from "my-types";
 
