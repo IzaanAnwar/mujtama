@@ -2,6 +2,7 @@
 import { useState } from "react";
 import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
+import { loginFormSchema } from "@/utils/validator";
 
 export interface LoginFormValues {
     email: string;
@@ -29,9 +30,16 @@ export default function Login() {
         event: React.FormEvent<HTMLFormElement>,
     ): Promise<void> => {
         event.preventDefault();
-        console.log("form val=>", formValue);
-        if (formValue.email == "" || formValue.password == "") {
-            setPostError("Missing Fields");
+        const formValidationRes = loginFormSchema.safeParse(formValue);
+        if (!formValidationRes.success) {
+            const errMsg = formValidationRes.error.errors;
+            if (errMsg.length > 1) {
+                setPostError("Please fill the form");
+                return;
+            }
+            errMsg.forEach((err) => {
+                setPostError(err.message);
+            });
             return;
         }
 
@@ -46,7 +54,6 @@ export default function Login() {
         } else {
             router.push("/dashboard");
         }
-        console.log("login res =>", response);
     };
 
     /**

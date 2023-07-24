@@ -1,4 +1,5 @@
 "use client";
+import { registerFormSchema } from "@/utils/validator";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -7,6 +8,7 @@ export interface RegisterFormValues {
     name: string;
     email: string;
     password: string;
+    confirmPass: string;
 }
 
 /**
@@ -19,8 +21,9 @@ export default function Register() {
         name: "",
         email: "",
         password: "",
+        confirmPass: "",
     });
-    const [postError, setPostError] = useState<string | null>(null);
+    const [postError, setPostError] = useState<string | null>();
 
     /**
      * Handles form submission.
@@ -31,15 +34,21 @@ export default function Register() {
         event: React.FormEvent<HTMLFormElement>,
     ): Promise<void> => {
         event.preventDefault();
-        if (
-            formValue.email == "" ||
-            formValue.password == "" ||
-            formValue.name == ""
-        ) {
-            setPostError("Missing Fields");
-            return;
-        }
+
         try {
+            const formValidationRes = registerFormSchema.safeParse(formValue);
+            if (!formValidationRes.success) {
+                const errMsg = formValidationRes.error.errors;
+                if (errMsg.length > 1) {
+                    setPostError("Please fill the form");
+                    return;
+                }
+                errMsg.forEach((err) => {
+                    setPostError(err.message);
+                });
+
+                return;
+            }
             const response = await fetch("/api/register/", {
                 method: "POST",
                 headers: {
@@ -82,11 +91,7 @@ export default function Register() {
                 className="form-control shadow-md rounded px-8 py-6 bg-zinc-900"
                 onSubmit={handleSubmit}
             >
-                <div className="mb-4">
-                    <label
-                        className="block text-gray-700 text-sm font-bold mb-2"
-                        htmlFor="name"
-                    ></label>
+                <div className="mb-2">
                     <label className="label">Name</label>
                     <input
                         name="name"
@@ -98,7 +103,7 @@ export default function Register() {
                         onChange={handleChange}
                     />
                 </div>
-                <div className="mb-4">
+                <div className="mb-2">
                     <label className="label">Email</label>
                     <input
                         placeholder="abbas@example.com"
@@ -110,11 +115,22 @@ export default function Register() {
                         onChange={handleChange}
                     />
                 </div>
-                <div className="mb-4">
+                <div className="mb-2">
                     <label className="label">Password</label>
                     <input
                         type="password"
                         name="password"
+                        className={`input ${
+                            postError && "input-error"
+                        } rounded w-full py-2 px-3`}
+                        onChange={handleChange}
+                    />
+                </div>
+                <div className="mb-2">
+                    <label className="label">Confirm Password</label>
+                    <input
+                        type="password"
+                        name="confirmPass"
                         className={`input ${
                             postError && "input-error"
                         } rounded w-full py-2 px-3`}
