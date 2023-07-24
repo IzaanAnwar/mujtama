@@ -17,6 +17,7 @@ export default function Navbar() {
                     </Link>
                 </div>
                 <div className="flex-none gap-2">
+                    {/* search bar and notification for later */}
                     {/* <div className="form-control">
                         <input
                             type="text"
@@ -24,7 +25,7 @@ export default function Navbar() {
                             className="input input-bordered w-24 md:w-auto"
                         />
                     </div> */}
-                    <button className="btn btn-ghost btn-circle">
+                    {/* <button className="btn btn-ghost btn-circle">
                         <div className="indicator">
                             <svg
                                 xmlns="http://www.w3.org/2000/svg"
@@ -42,7 +43,7 @@ export default function Navbar() {
                             </svg>
                             <span className="badge badge-xs badge-primary indicator-item"></span>
                         </div>
-                    </button>
+                    </button> */}
                     <div className="dropdown dropdown-bottom dropdown-end">
                         <label
                             tabIndex={0}

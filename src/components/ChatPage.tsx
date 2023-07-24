@@ -1,6 +1,6 @@
 "use client";
 import { Message, User } from "my-types";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Loading from "./Loading";
 import { pusherClient } from "@/lib/pusher";
 import Image from "next/image";
@@ -18,34 +18,6 @@ const ChatPage = ({ user }: { user: User }) => {
 
     const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         setMessage(event.target.value);
-    };
-
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    const fetchMoreChats = async () => {
-        const lastMsg = allMsg[0];
-
-        try {
-            const res = await fetch(
-                `/api/chat/more?${user.chatRoomId}?${lastMsg.id}`,
-                {
-                    method: "GET",
-                    headers: {
-                        "Content-Type": "application/json",
-                    },
-                },
-            );
-
-            const { data: newChats }: { data: Message[] } = await res.json();
-
-            setAllMsg((prevChats) => [
-                ...newChats.slice().reverse(),
-                ...prevChats,
-            ]);
-        } catch (error: any) {
-            console.log(error);
-            alert("Something went wrong please reload the page");
-            router.replace(pathName);
-        }
     };
 
     const scrollToBottom = () => {
@@ -125,6 +97,33 @@ const ChatPage = ({ user }: { user: User }) => {
     }, [loadingComplete]);
 
     useEffect(() => {
+        const fetchMoreChats = async () => {
+            const lastMsg = allMsg[0];
+
+            try {
+                const res = await fetch(
+                    `/api/chat/more?${user.chatRoomId}?${lastMsg.id}`,
+                    {
+                        method: "GET",
+                        headers: {
+                            "Content-Type": "application/json",
+                        },
+                    },
+                );
+
+                const { data: newChats }: { data: Message[] } =
+                    await res.json();
+
+                setAllMsg((prevChats) => [
+                    ...newChats.slice().reverse(),
+                    ...prevChats,
+                ]);
+            } catch (error: any) {
+                console.log(error);
+                alert("Something went wrong please reload the page");
+                router.replace(pathName);
+            }
+        };
         const handleScrollToTop = async () => {
             if (chatContainerRef.current) {
                 const viewIsNearTop = chatContainerRef.current.scrollTop === 0;
@@ -141,7 +140,7 @@ const ChatPage = ({ user }: { user: User }) => {
         return () => {
             chatContainer?.removeEventListener("scroll", handleScrollToTop);
         };
-    }, [fetchMoreChats]);
+    }, [allMsg, pathName, router, user.chatRoomId]);
 
     return (
         <div className="flex flex-col h-[85vh] bg-zinc-900  rounded-lg">
