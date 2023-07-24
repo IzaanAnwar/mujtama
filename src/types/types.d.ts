@@ -14,6 +14,7 @@ declare module "my-types" {
         email: string;
         id: string;
         role: string;
+        image?: string;
         chatRoomId: string;
     }
 

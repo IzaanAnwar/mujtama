@@ -4,14 +4,14 @@ import Image from "next/image";
 import Link from "next/link";
 
 export default function Navbar() {
-    const { data: session, status } = useSession();
+    const { data: session } = useSession();
     return (
-        <nav>
+        <nav className="px-2 md:px-16">
             <div className="navbar bg-base-100">
                 <div className="flex-1">
                     <Link
                         href="/"
-                        className="btn btn-ghost  normal-case text-xl"
+                        className="btn btn-ghost  normal-case text-xl hover:text-primary duration-300"
                     >
                         Mujtama
                     </Link>
@@ -43,14 +43,18 @@ export default function Navbar() {
                             <span className="badge badge-xs badge-primary indicator-item"></span>
                         </div>
                     </button>
-                    <div className="dropdown dropdown-end ">
+                    <div className="dropdown dropdown-bottom dropdown-end">
                         <label
                             tabIndex={0}
                             className="btn btn-ghost btn-circle avatar"
                         >
                             <div className="w-10 rounded-full">
                                 <Image
-                                    src="https://images.unsplash.com/photo-1688164987143-3938a38cf69c?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxlZGl0b3JpYWwtZmVlZHwzfHx8ZW58MHx8fHx8&auto=format&fit=crop&w=600&q=60"
+                                    src={
+                                        session?.user?.image
+                                            ? session.user.image
+                                            : "/user-profile.png"
+                                    }
                                     alt="profile"
                                     width={40}
                                     height={40}
@@ -67,7 +71,6 @@ export default function Navbar() {
                                     href="/profile"
                                 >
                                     Profile
-                                    <span className="badge">New</span>
                                 </Link>
                             </li>
                             <li>

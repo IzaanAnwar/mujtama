@@ -69,7 +69,7 @@ export const authOptions: NextAuthOptions = {
                         id: token.id,
                         role: token.role,
                         chatRoomId: token.chatRoomId,
-                    } as User,
+                    },
                 };
             }
             return {
@@ -78,6 +78,7 @@ export const authOptions: NextAuthOptions = {
                     ...session.user,
                     id: token.id,
                     role: dbUser.role,
+                    image: dbUser.image,
                     chatRoomId: dbUser.chatRoomId,
                 } as User,
             };

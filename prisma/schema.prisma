@@ -12,12 +12,12 @@ datasource db {
 }
 
 model User {
-  id       String @id @default(uuid())
-  email    String @unique
-  name     String
-  password String
-  role     Role   @default(BEGINNER)
-
+  id         String    @id @default(uuid())
+  email      String    @unique
+  name       String
+  password   String
+  role       Role      @default(BEGINNER)
+  image      String?
   Tasks      Task[]
   Message    Message[]
   chatRoom   ChatRoom  @relation(fields: [chatRoomId], references: [id])

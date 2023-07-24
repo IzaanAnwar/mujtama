@@ -162,10 +162,14 @@ const ChatPage = ({ user }: { user: User }) => {
                             <div className="chat-image avatar">
                                 <div className="w-10  rounded-full">
                                     <Image
-                                        src="/images/photo.jpg"
+                                        src={
+                                            msg.sender?.image ??
+                                            "/user-profile.png"
+                                        }
                                         alt="profile"
-                                        width={10}
-                                        height={10}
+                                        width={40}
+                                        height={40}
+                                        className="w-full h-full"
                                     />
                                 </div>
                             </div>

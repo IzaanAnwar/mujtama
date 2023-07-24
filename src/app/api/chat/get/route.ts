@@ -18,6 +18,10 @@ export const GET = async (req: NextRequest) => {
             },
         });
         console.log(resDb);
+        // await prisma.task.deleteMany();
+        // await prisma.message.deleteMany();
+        // await prisma.user.deleteMany();
+        // await prisma.chatRoom.deleteMany();
 
         return new NextResponse(
             JSON.stringify({ message: "success", data: resDb }),

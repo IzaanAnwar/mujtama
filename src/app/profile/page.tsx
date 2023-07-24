@@ -1,22 +1,31 @@
 "use client";
-import React, { useState } from "react";
+import React, { use, useEffect, useState } from "react";
 import Image from "next/image";
 import { useSession } from "next-auth/react";
 import Link from "next/link";
 import Loading from "../../components/Loading";
 import { User } from "my-types";
 import { useRouter } from "next/navigation";
+import { UploadButton } from "@/utils/uploadthing";
+import "@uploadthing/react/styles.css";
 
 const Profile = () => {
     const router = useRouter();
     const { data: session, status } = useSession();
-    const [userImage, setUserImage] = useState<string>("");
+    const [userImage, setUserImage] = useState<string>(
+        session?.user?.image ?? "",
+    );
     const [userName, setUserName] = useState<string>(
         session?.user?.name as string,
     );
-    console.log(userName);
+    console.log(userName, "img", userImage, "ses", session);
 
     const [isDisabled, setInputStatus] = useState<boolean>(true);
+    useEffect(() => {
+        if (session?.user?.image) {
+            setUserImage(session?.user?.image);
+        }
+    }, [session]);
 
     if (status === "loading") {
         return <Loading />;
@@ -28,24 +37,6 @@ const Profile = () => {
     }
     const user = session.user as User;
 
-    const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        const file = event.target.files && event.target.files[0];
-        const reader = new FileReader();
-
-        reader.onload = (event) => {
-            setUserImage(event.target?.result as string);
-        };
-
-        reader.onloadend = () => {
-            reader.abort();
-        };
-
-        if (file) {
-            reader.readAsDataURL(file);
-        } else {
-            setUserImage("");
-        }
-    };
     const handleUserNameChange = async (
         event: React.MouseEvent<SVGSVGElement, MouseEvent>,
     ) => {
@@ -71,26 +62,28 @@ const Profile = () => {
 
     return (
         <div className="container mx-auto px-4 py-8">
-            <div className="flex flex-col sm:flex-row items-center justify-center sm:border-2 bg-zinc-900 sm:border-zinc-800 sm:rounded-md sm:p-4 sm:mx-2 md:mx-32 mx-4 sm:space-x-8">
-                <div className="w-24 h-24 rounded-full overflow-hidden sm:mx-16 mx-4">
+            <div className="flex flex-col sm:flex-row items-center justify-center sm:border-2 bg-zinc-900 sm:border-zinc-800 py-4 sm:p-4 sm:mx-2 md:mx-32 mx-4 sm:space-x-8 rounded-md">
+                <div className="w-32 h-32 rounded-full overflow-hidden md:mx-16 mx-4">
                     {userImage ? (
                         <Image
                             src={userImage as string}
                             alt="Profile Image"
                             width={128}
                             height={128}
+                            className="w-full h-full"
                         />
                     ) : (
                         <Image
-                            src="/images/photo.jpg"
+                            src="/user-profile.png"
                             alt="Profile Image"
-                            width={96}
-                            height={96}
+                            width={128}
+                            height={128}
+                            className="w-full h-full"
                         />
                     )}
                 </div>
                 <div className="sm:py-8 py-2">
-                    <div className=" flex justify-start items-center w-full sm:w-auto">
+                    <div className=" flex md:justify-start justify-center items-center w-full sm:w-auto">
                         <input
                             value={
                                 userName !== undefined ? userName : user.name
@@ -147,32 +140,39 @@ const Profile = () => {
                             )}
                         </span>
                     </div>
-                    <p className="text-gray-600">{user?.email}</p>
-                    <div className="mt-4">
-                        <label className="btn btn-sm btn-primary">
-                            Change Profile Image
-                            <input
-                                type="file"
-                                accept="image/*"
-                                className="hidden"
-                                onChange={handleImageChange}
-                            />
-                        </label>
+                    <p className="md:text-start text-center text-gray-600">
+                        {user?.email}
+                    </p>
+                    <div className="mt-4 flex justify-center md:justify-start items-center md:items-start">
+                        <UploadButton
+                            endpoint="profilePicture"
+                            onClientUploadComplete={(res) => {
+                                // Do something with the response
+                                console.log("Files: ", res);
+                                if (res && res[0]) {
+                                    setUserImage(res[0].fileUrl);
+                                }
+                                alert("Upload Completed");
+                            }}
+                            onUploadError={(error: Error) => {
+                                // Do something with the error.
+                                alert(`ERROR! ${error.message}`);
+                            }}
+                        />
                     </div>
                 </div>
             </div>
             <div className="flex justify-center items-center mt-4 space-x-4">
-                {/* <div className="mt-4">
-                        <p>Completed Tasks: {userData.completedTasks}</p>
-                        <p>Ongoing Tasks: {userData.ongoingTasks}</p>
-                        <p>Current Room: {user?.role}</p>
-                        <p>
-                            Tasks to Promote:{" "}
-                            {userData.tasksToPromote - userData.completedTasks}
-                            more tasks needed
-                        </p>
-                    </div> */}
                 <div className="mt-4">
+                    <p className="text-primary">Completed Tasks: {user.id}</p>
+                    <p className="text-primary">
+                        Ongoing Tasks: {user.chatRoomId}
+                    </p>
+                    <p className="text-primary">Current Room: {user?.role}</p>
+                </div>
+            </div>
+            <div className="flex justify-center items-center">
+                <div className="mt-4 block">
                     <Link href="/profile/settings" className="text-blue-500">
                         Go to Settings
                     </Link>
