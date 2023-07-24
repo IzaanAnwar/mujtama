@@ -12,7 +12,7 @@ export const GET = async (req: NextRequest) => {
             include: {
                 sender: true,
             },
-            take: 25,
+            take: 50,
             orderBy: {
                 timeStamp: "desc",
             },

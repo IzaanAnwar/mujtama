@@ -114,10 +114,9 @@ const ChatPage = ({ user }: { user: User }) => {
                 const { data: newChats }: { data: Message[] } =
                     await res.json();
 
-                setAllMsg((prevChats) => [
-                    ...newChats.slice().reverse(),
-                    ...prevChats,
-                ]);
+                const revChats = newChats.slice().reverse();
+
+                setAllMsg((prevChats) => [...revChats, ...prevChats]);
             } catch (error: any) {
                 console.log(error);
                 alert("Something went wrong please reload the page");
