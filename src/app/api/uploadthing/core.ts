@@ -9,7 +9,7 @@ import { utapi } from "uploadthing/server";
 const fs = createUploadthing();
 
 export const ourFileRouter = {
-    profilePicture: fs(["image"])
+    profilePicture: fs({ image: { maxFileSize: "16MB", maxFileCount: 1 } })
         .middleware(async ({ req }) => {
             console.log(req.body, req.credentials, req.url);
             const session = await getServerSession(authOptions);

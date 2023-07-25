@@ -156,7 +156,9 @@ const Profile = () => {
                             }}
                             onUploadError={(error: Error) => {
                                 // Do something with the error.
-                                alert(`ERROR! ${error.message}`);
+                                alert(
+                                    `ERROR! ${error.message} | or try another image`,
+                                );
                             }}
                         />
                     </div>
