@@ -27,6 +27,9 @@ export const GET = async (req: NextRequest) => {
                     { timeStamp: { lt: lastMsg.timeStamp } },
                 ],
             },
+            include: {
+                sender: true,
+            },
             take: 25,
             orderBy: {
                 timeStamp: "desc",

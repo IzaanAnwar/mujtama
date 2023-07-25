@@ -6,6 +6,9 @@ import { pusherClient } from "@/lib/pusher";
 import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
 
+/** size of Chat container + the distance between them */
+const CHAT_CONTAINER_SIZE = 70;
+
 const ChatPage = ({ user }: { user: User }) => {
     const [message, setMessage] = useState("");
     const [allMsg, setAllMsg] = useState<Message[]>([]);
@@ -97,10 +100,10 @@ const ChatPage = ({ user }: { user: User }) => {
     }, [loadingComplete]);
 
     useEffect(() => {
+        /** get more messages from the database when the user scrolls to the top */
         const fetchMoreChats = async () => {
-            const lastMsg = allMsg[0];
-
             try {
+                const lastMsg = allMsg[0];
                 const res = await fetch(
                     `/api/chat/more?${user.chatRoomId}?${lastMsg.id}`,
                     {
@@ -113,23 +116,29 @@ const ChatPage = ({ user }: { user: User }) => {
 
                 const { data: newChats }: { data: Message[] } =
                     await res.json();
+                console.log(newChats);
 
                 const revChats = newChats.slice().reverse();
 
                 setAllMsg((prevChats) => [...revChats, ...prevChats]);
+                return revChats.length;
             } catch (error: any) {
                 console.log(error);
                 alert("Something went wrong please reload the page");
                 router.replace(pathName);
+                return 0;
             }
         };
+
         const handleScrollToTop = async () => {
             if (chatContainerRef.current) {
                 const viewIsNearTop = chatContainerRef.current.scrollTop === 0;
                 console.log(viewIsNearTop);
 
                 if (viewIsNearTop) {
-                    await fetchMoreChats();
+                    const numOfMoreChats = await fetchMoreChats();
+                    chatContainerRef.current.scrollTop =
+                        numOfMoreChats * CHAT_CONTAINER_SIZE;
                 }
             }
         };
