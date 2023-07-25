@@ -59,7 +59,7 @@ export default function Register() {
             console.log("reg response => ", response);
 
             if (response.status === 201) {
-                router.push("/dashboard");
+                router.push("/login");
             } else if (response.status === 409) {
                 setPostError("Account Exists");
             } else {

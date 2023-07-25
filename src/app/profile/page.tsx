@@ -166,11 +166,10 @@ const Profile = () => {
             </div>
             <div className="flex justify-center items-center mt-4 space-x-4">
                 <div className="mt-4">
-                    <p className="text-primary">Completed Tasks: {user.id}</p>
-                    <p className="text-primary">
-                        Ongoing Tasks: {user.chatRoomId}
-                    </p>
-                    <p className="text-primary">Current Room: {user?.role}</p>
+                    <span className="flex">
+                        Current Room: &nbsp;
+                        <p className="font-bold text-primary">{user?.role}</p>
+                    </span>
                 </div>
             </div>
             <div className="flex justify-center items-center">
