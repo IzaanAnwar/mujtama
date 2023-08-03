@@ -33,9 +33,9 @@ const Home = async () => {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6 text-gray-800 min-h-[50vh]">
                 <div className="p-4 bg-gray-100 rounded shadow">
                     <h2 className="text-lg md:text-2xl font-semibold mb-4">
-                        Rooms
+                        Chat Room
                     </h2>
-                    <ul className="list-disc pl-6">
+                    <ul className="list-disc pl-6 text-primary hover:text-zinc-900  duration-200">
                         <li>
                             <a href={`/dashboard/room/${user.role}`}>
                                 {user.role}
